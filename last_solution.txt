@@ -1,0 +1,10 @@
+-------------------Xffffgrrggggggfffffff
++-------------------Xffggrggggggffffffff
++--------------------XXgrrggggggffffffff
++--------------++++----XXgggggggffffffff
+++++++++++++++++-X+++++++Xggggggffffffff
+-----------------X-----X++XXgggggfffffff
+----------------X-----XgX+++XXXXXXggffff
+-------------XX--------XXXX+++++++XXXggg
+-----X-------XX----------XgXXXXXX++++XXg
+-----X--------------------XggggggXXX+++-
