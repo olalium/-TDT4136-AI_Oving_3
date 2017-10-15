@@ -66,7 +66,7 @@ def success(board, x, open_d, closed):
 
     f.close()
 
-    print('last_solution.txt is available in directory')
+    print('last_solution.txt is available in directory, "+" = path , "-" = closed and "X" = open')
 
 # calculates the g value of a node on a map_array, values from list in task
 def calculate_g(map_array, new_node):
