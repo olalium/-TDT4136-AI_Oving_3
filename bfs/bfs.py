@@ -1,10 +1,13 @@
-import board_manipulation as b_m
-from functions import manhattan_distance as m_h
-from functions import generate_all_successors as g_a_s
-from functions import attach_and_eval as a_a_e
-from functions import propagate_path_improvements as p_p_i
 import heapq #for priority queue
+
+from functions import attach_and_eval as a_a_e
+from functions import generate_all_successors as g_a_s
+from functions import manhattan_distance as m_h
+from functions import propagate_path_improvements as p_p_i
+
+import board_manipulation as b_m
 from search_node import search_node
+
 
 def main():
     board = b_m.generate_board(input('board 1-1 to 1-4 or 2-1 to 2-4:'))
@@ -23,10 +26,8 @@ def main():
     existing[n0.location] = n0 # adds n0 to existing dictionary, with key on node.location
     open_d[n0.location] = n0   # adds n0 to open dictionary, with key on node.location
 
-    # stores in heap to get priority queue, on format [(f,(x,y))],
-    # heapq understands that the f value is the one that needs to sort
-    priority_q = [(n0.f,n0.location)]
-    heapq.heapify(priority_q)
+    # stores in a first in first out q to get bfs
+    fifo_q = [n0.location]
 
     n0.status = 'open_d' # states that n0 is opened
     solution = None
@@ -39,9 +40,8 @@ def main():
             print('fail')
             return 'fail'
 
-        # assign node with lowest f from priority queue to x
-        # item that pops is on format:( f , node.location )
-        x = open_d[heapq.heappop(priority_q)[1]]
+        # assign node from fifo queue
+        x = open_d[fifo_q.pop()]
         open_d.pop(x.location)
 
         # add x to closed dictionary
@@ -50,7 +50,7 @@ def main():
 
         # if manhattan distance is 0, reacehd goal
         if (m_h(x.location, goal_location)) == 0:
-            print('success', x.state, open_d, closed)
+            print('success', x.state)
             return b_m.success(board, x, open_d, closed) # does not check other solution
 
         # generate all child noes to node x
@@ -75,10 +75,10 @@ def main():
                 # attach and eval routine
                 a_a_e(board, succssessors[S], x, goal_location)
 
-                # push S onto open dictionary (easy indexing) and priority queue (quick sorting by f)
+                # push S onto open dictionary (easy indexing) and fifo queue
                 open_d[S] = succssessors[S]
-                heapq.heappush(priority_q, (succssessors[S].f, succssessors[S].location))
-                heapq.heapify(priority_q)
+                succssessors[S].status = 'open_d'
+                fifo_q.insert(0,succssessors[S].location)
 
             # check if there is a cheaper way to S
             elif (x.g + b_m.calculate_g(board, succssessors[S])) < succssessors[S].g:

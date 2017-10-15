@@ -1,7 +1,8 @@
 
+# generates board to a map_ array on format: [['.','.']['.','.']]
 def generate_board(input):
 
-    f = open('boards/board-'+input+'.txt', 'r')
+    f = open('../boards/board-'+input+'.txt', 'r')
     map_array = []
 
     for line in f:
@@ -12,6 +13,7 @@ def generate_board(input):
 
     return map_array
 
+# locates a certain unique-in-map_array-value and returns x & y values
 def locate(map_array, node):
 
     y_val = -1
@@ -29,6 +31,7 @@ def locate(map_array, node):
 
                 return x_val, y_val
 
+# returns the value in map array location 'l'
 def get_map_value(map_array, l):
 
     x_val = l[0]
@@ -36,18 +39,19 @@ def get_map_value(map_array, l):
 
     return map_array[y_val][x_val]
 
+# returns the original map_array board with different values representing opened, closed and optimal solution nodes
 def success(board, x, open_d, closed):
 
     solution_board = board
     x.state.pop()
 
     for item in open_d.values():
-
-        solution_board[item.location[1]][item.location[0]] = 'X'
+        if get_map_value(board, item.location) != 'A' and get_map_value(board, item.location) != 'B':
+            solution_board[item.location[1]][item.location[0]] = 'X'
 
     for item in closed.values():
-
-        solution_board[item.location[1]][item.location[0]] = '-'
+        if get_map_value(board, item.location) != 'A' and get_map_value(board, item.location) != 'B':
+            solution_board[item.location[1]][item.location[0]] = '-'
 
     for item in x.state:
 
@@ -62,8 +66,9 @@ def success(board, x, open_d, closed):
 
     f.close()
 
-    print('last_solution.tx is available in directory')
+    print('last_solution.txt is available in directory')
 
+# calculates the g value of a node on a map_array, values from list in task
 def calculate_g(map_array, new_node):
 
     map_value = get_map_value(map_array, new_node.location)
