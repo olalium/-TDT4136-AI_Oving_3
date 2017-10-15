@@ -1,3 +1,7 @@
+from PIL import Image
+from numpy import uint8
+from numpy import zeros
+import copy
 
 # generates board to a map_ array on format: [['.','.']['.','.']]
 def generate_board(input):
@@ -42,8 +46,11 @@ def get_map_value(map_array, l):
 # returns the original map_array board with different values representing opened, closed and optimal solution nodes
 def success(board, x, open_d, closed):
 
+    old_board = copy.deepcopy(board)
+
     solution_board = board
-    x.state.pop()
+
+    x.state.pop() # removes node from path so A and B show on map
 
     for item in open_d.values():
         if get_map_value(board, item.location) != 'A' and get_map_value(board, item.location) != 'B':
@@ -57,6 +64,8 @@ def success(board, x, open_d, closed):
 
         solution_board[item[1]][item[0]] = '+'
 
+    success_image(old_board, solution_board)
+
     f = open('last_solution.txt', 'w')
 
     for line in solution_board:
@@ -66,7 +75,8 @@ def success(board, x, open_d, closed):
 
     f.close()
 
-    print('last_solution.txt is available in directory, "+" = path , "-" = closed and "X" = open')
+    print('last_solution.txt is available in directory, "+" = path , "-" = closed and "X" = open'
+          '\nfinal_solution.png is available in directory, purple = closed, light blue = open, red = path')
 
 # calculates the g value of a node on a map_array, values from list in task
 def calculate_g(map_array, new_node):
@@ -87,3 +97,56 @@ def calculate_g(map_array, new_node):
         value = 1
     return value
 
+#creates image using PIL of solution board, pretty complicated and ugly, but does the trick
+def success_image(board, solution_board):
+
+    #task1 = 20x7
+    #task2 = 40x10
+
+    cons = 20
+
+    legen_d = {'.':[255, 255, 255], '#':[10,10,10], 'w':[0,0,200],
+               'm':[128,128,128],'f':[0,128,0],'g':[0,200,0],
+               'r':[153,50,0], 'A':[255,0,0], 'B':[255,0,0]}
+
+    solution_d = {'+':[255,0,0],'-':[128,0,255],'X':[0,255,255]}
+
+    height_board = len(board)
+    width_board = len(board[0])
+
+    width_pic = width_board*cons
+    height_pic = height_board*cons
+
+    pic_array = zeros((height_pic, width_pic, 3), dtype=uint8)
+
+    y_val = -1
+    for y in solution_board:
+        y_val += 1
+        x_val = -1
+        for x in y:
+            x_val += 1
+            if x in legen_d.keys():
+                rgb_val = legen_d[x]
+                i_val = x_val*cons
+                for i in range(i_val+1, i_val+cons-1):
+                    j_val = y_val * cons
+                    for j in range(j_val+1, j_val+cons-1):
+                        pic_array[j][i] = rgb_val
+            elif x in solution_d.keys():
+                rgb_val = legen_d[board[y_val][x_val]]
+                i_val = x_val * cons
+                for i in range(i_val + 1, i_val + cons - 1):
+                    j_val = y_val * cons
+                    for j in range(j_val + 1, j_val + cons - 1):
+                        pic_array[j][i] = rgb_val
+                rgb_val = solution_d[x]
+                i_val = x_val * cons
+                for i in range(i_val + 5, i_val + 10):
+                    j_val = y_val * cons
+                    for j in range(j_val + 5, j_val + 10):
+                        pic_array[j][i] = rgb_val
+
+
+    img = Image.fromarray(pic_array, 'RGB')
+    img.show()
+    img.save('final_solution.png')
